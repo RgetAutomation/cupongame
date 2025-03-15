@@ -77,6 +77,18 @@ function drawBooms() {
     }
 }
 
+// Handle player movement with keyboard
+function handleKeyboardInput(event) {
+    if (gameOver) return; // Stop input if game is over
+
+    if (event.key === "ArrowLeft") {
+        player.velocityX = -player.speed; // Move left
+    }
+    if (event.key === "ArrowRight") {
+        player.velocityX = player.speed; // Move right
+    }
+}
+
 // Handle player movement with mouse
 function handleMouseMovement(event) {
     if (gameOver) return; // Stop movement if game is over
@@ -87,6 +99,26 @@ function handleMouseMovement(event) {
 
     // Update player position
     player.x = mouseX - player.width / 2;
+
+    // Prevent the player from going out of bounds
+    if (player.x < 0) {
+        player.x = 0;
+    }
+    if (player.x + player.width > canvas.width) {
+        player.x = canvas.width - player.width;
+    }
+}
+
+// Handle player movement with touch
+function handleTouchMovement(event) {
+    if (gameOver) return; // Stop movement if game is over
+
+    // Get touch X position relative to the canvas
+    const rect = canvas.getBoundingClientRect();
+    const touchX = event.touches[0].clientX - rect.left;
+
+    // Update player position
+    player.x = touchX - player.width / 2;
 
     // Prevent the player from going out of bounds
     if (player.x < 0) {
@@ -155,6 +187,23 @@ function update() {
         }
     }
 
+    // Handle player movement
+    if (!isTouchDevice()) {
+        // Apply friction for keyboard movement
+        player.velocityX *= 0.9;
+        player.x += player.velocityX;
+    }
+
+    // Prevent the player from going out of bounds
+    if (player.x < 0) {
+        player.x = 0;
+        player.velocityX = 0;
+    }
+    if (player.x + player.width > canvas.width) {
+        player.x = canvas.width - player.width;
+        player.velocityX = 0;
+    }
+
     // Check for collisions
     checkCollisions();
 }
@@ -207,6 +256,11 @@ function clearCanvas() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
+// Check if the device is a touch device
+function isTouchDevice() {
+    return "ontouchstart" in window || navigator.maxTouchPoints > 0;
+}
+
 // Game loop
 function gameLoop() {
     clearCanvas();
@@ -224,8 +278,15 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-// Event listener for mouse movement
-canvas.addEventListener("mousemove", handleMouseMovement);
+// Event listeners for controls
+if (isTouchDevice()) {
+    // Touch controls for mobile devices
+    canvas.addEventListener("touchmove", handleTouchMovement);
+} else {
+    // Keyboard and mouse controls for desktop
+    document.addEventListener("keydown", handleKeyboardInput);
+    canvas.addEventListener("mousemove", handleMouseMovement);
+}
 
 // Start creating coins and booms
 coinInterval = setInterval(createCoin, 1000); // Store coin interval ID
