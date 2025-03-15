@@ -15,10 +15,16 @@ const player = {
 // Coins
 const coins = [];
 const coinSize = 20;
+let coinSpeed = 3; // Initial coin speed
 
 // Boom
 const booms = [];
 const boomSize = 20;
+
+// Blinking Coins
+const blinkingCoins = [];
+const blinkCoinSize = 25;
+let blinkCoinSpeed = 2; // Speed of blinking coins
 
 let score = 0;
 let gameOver = false;
@@ -34,7 +40,7 @@ function createCoin() {
         y: 0,
         size: coinSize,
         color: "gold",
-        speed: 3,
+        speed: coinSpeed,
     };
     coins.push(coin);
 }
@@ -49,6 +55,22 @@ function createBoom() {
         speed: 3,
     };
     booms.push(boom);
+}
+
+// Create a blinking coin
+function createBlinkingCoin() {
+    const blinkCoin = {
+        x: Math.random() > 0.5 ? 0 : canvas.width, // Start from left or right corner
+        y: 0,
+        size: blinkCoinSize,
+        color: "cyan",
+        speed: blinkCoinSpeed,
+        directionX: Math.random() > 0.5 ? 1 : -1, // Move left or right
+        directionY: 1, // Move down
+        blinkTimer: 0, // Timer for blinking effect
+        visible: true, // Toggle visibility for blinking
+    };
+    blinkingCoins.push(blinkCoin);
 }
 
 // Draw the player
@@ -74,6 +96,18 @@ function drawBooms() {
         ctx.beginPath();
         ctx.arc(booms[i].x + booms[i].size / 2, booms[i].y + booms[i].size / 2, booms[i].size / 2, 0, Math.PI * 2);
         ctx.fill();
+    }
+}
+
+// Draw the blinking coins
+function drawBlinkingCoins() {
+    for (let i = 0; i < blinkingCoins.length; i++) {
+        if (blinkingCoins[i].visible) {
+            ctx.fillStyle = blinkingCoins[i].color;
+            ctx.beginPath();
+            ctx.arc(blinkingCoins[i].x + blinkingCoins[i].size / 2, blinkingCoins[i].y + blinkingCoins[i].size / 2, blinkingCoins[i].size / 2, 0, Math.PI * 2);
+            ctx.fill();
+        }
     }
 }
 
@@ -141,6 +175,12 @@ function checkCollisions() {
         ) {
             coins.splice(i, 1); // Remove the coin
             score++; // Increase score
+
+            // Increase coin speed 2x every 20 points
+            if (score % 20 === 0) {
+                coinSpeed *= 2; // Double the coin speed
+                createBlinkingCoin(); // Create a blinking coin
+            }
         }
     }
 
@@ -151,6 +191,20 @@ function checkCollisions() {
             player.x + player.width > booms[i].x &&
             player.y < booms[i].y + booms[i].size &&
             player.y + player.height > booms[i].y
+        ) {
+            gameOver = true; // End the game
+            stopGame(); // Stop the game
+            showGameOverScreen(); // Show game over screen
+        }
+    }
+
+    // Check blinking coin collisions
+    for (let i = 0; i < blinkingCoins.length; i++) {
+        if (
+            player.x < blinkingCoins[i].x + blinkingCoins[i].size &&
+            player.x + player.width > blinkingCoins[i].x &&
+            player.y < blinkingCoins[i].y + blinkingCoins[i].size &&
+            player.y + player.height > blinkingCoins[i].y
         ) {
             gameOver = true; // End the game
             stopGame(); // Stop the game
@@ -184,6 +238,27 @@ function update() {
         // Remove booms that go off the screen
         if (booms[i].y > canvas.height) {
             booms.splice(i, 1);
+        }
+    }
+
+    // Move blinking coins diagonally
+    for (let i = 0; i < blinkingCoins.length; i++) {
+        blinkingCoins[i].x += blinkingCoins[i].directionX * blinkCoinSpeed; // Move left or right
+        blinkingCoins[i].y += blinkingCoins[i].directionY * blinkCoinSpeed; // Move down
+
+        // Toggle visibility for blinking effect
+        blinkingCoins[i].blinkTimer++;
+        if (blinkingCoins[i].blinkTimer % 20 === 0) {
+            blinkingCoins[i].visible = !blinkingCoins[i].visible;
+        }
+
+        // Remove blinking coins that go off the screen
+        if (
+            blinkingCoins[i].y > canvas.height ||
+            blinkingCoins[i].x < 0 ||
+            blinkingCoins[i].x > canvas.width
+        ) {
+            blinkingCoins.splice(i, 1);
         }
     }
 
@@ -267,6 +342,7 @@ function gameLoop() {
     drawPlayer();
     drawCoins();
     drawBooms();
+    drawBlinkingCoins();
     drawScore();
 
     if (gameOver) {
