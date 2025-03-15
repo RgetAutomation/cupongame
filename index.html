@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coin Collector Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212; /* Dark background */
+            color: #ffffff; /* White text */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #ffcc00; /* Yellow heading */
+        }
+        p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #cccccc; /* Light gray text */
+        }
+        canvas {
+            display: block;
+            background: #1e1e1e; /* Dark canvas background */
+            max-width: 100%; /* Ensure canvas doesn't overflow */
+            max-height: 70vh; /* Ensure canvas doesn't overflow */
+            border: 2px solid #333; /* Dark border */
+        }
+        button {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            font-size: 4vw; /* Responsive font size */
+            cursor: pointer;
+            background-color: #ffcc00; /* Yellow button */
+            color: #ffffff; /* Dark text */
+            border: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #e6b800; /* Darker yellow on hover */
+        }
+        .info {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .info a {
+            color: #ffcc00; /* Yellow link */
+            text-decoration: none;
+        }
+        .info a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>RGET TECHNOLOGY</h1>
+    <p>Play this game and get discounts! Collect coins to earn discount coupons.</p>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div class="info">
+        <p>View Terms and Conditions For more information, visit <a href="https://rgetautomation.github.io/cupon/" target="_blank">RGET Technology</a>.</p>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>
