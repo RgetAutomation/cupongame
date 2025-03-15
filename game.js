@@ -77,36 +77,23 @@ function drawBooms() {
     }
 }
 
-// Handle player movement
-function handlePlayerMovement() {
+// Handle player movement with mouse
+function handleMouseMovement(event) {
     if (gameOver) return; // Stop movement if game is over
 
-    // Apply friction to slow down the player
-    player.velocityX *= 0.9;
+    // Get mouse X position relative to the canvas
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left;
 
-    // Move the player based on velocity
-    player.x += player.velocityX;
+    // Update player position
+    player.x = mouseX - player.width / 2;
 
     // Prevent the player from going out of bounds
     if (player.x < 0) {
         player.x = 0;
-        player.velocityX = 0;
     }
     if (player.x + player.width > canvas.width) {
         player.x = canvas.width - player.width;
-        player.velocityX = 0;
-    }
-}
-
-// Handle keyboard input
-function handleInput(event) {
-    if (gameOver) return; // Stop input if game is over
-
-    if (event.key === "ArrowLeft") {
-        player.velocityX = -player.speed; // Move left
-    }
-    if (event.key === "ArrowRight") {
-        player.velocityX = player.speed; // Move right
     }
 }
 
@@ -167,9 +154,6 @@ function update() {
             booms.splice(i, 1);
         }
     }
-
-    // Handle player movement
-    handlePlayerMovement();
 
     // Check for collisions
     checkCollisions();
@@ -240,8 +224,8 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-// Event listener for player movement
-document.addEventListener("keydown", handleInput);
+// Event listener for mouse movement
+canvas.addEventListener("mousemove", handleMouseMovement);
 
 // Start creating coins and booms
 coinInterval = setInterval(createCoin, 1000); // Store coin interval ID
